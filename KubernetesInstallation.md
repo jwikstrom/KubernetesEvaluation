@@ -53,7 +53,7 @@ KUBELET_EXTRA_ARGS=--node-ip=$local_ip
 EOF
 ```
 
-##Install Containerd
+#Install Containerd
 download containerd-<VERSION>-<OS>-<ARCH>.tar.gz at https://github.com/containerd/containerd/releases
 I am downloading containerd-1.7.15-linux-amd64.tar.gz
 ```
@@ -125,7 +125,7 @@ systemctl daemon-reload
 systemctl enable --now containerd
 ```
 
-##Install RunC
+#Install RunC
 Download runc.<ARCH> at: https://github.com/opencontainers/runc/releases
 I am downloading runc 1.1.12
 ```
