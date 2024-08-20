@@ -35,7 +35,7 @@ Run with correct *user@ip*
 
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-Copy the two commands from installation:
+Copy the top two commands from installation:
 
     (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> /home/joel/.bashrc
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
