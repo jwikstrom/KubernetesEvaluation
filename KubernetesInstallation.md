@@ -1,3 +1,4 @@
+### Setup K0s
 ## Initialize Node
 **On node:**
 
@@ -75,5 +76,3 @@ Test:
     kubectl cluster-info
     kubectl get nodes
 
-END OF STEP 1: Install K0s
-----------------
