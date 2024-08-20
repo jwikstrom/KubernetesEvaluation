@@ -76,4 +76,4 @@ Test:
     kubectl cluster-info
     kubectl get nodes
 
-#Setup environment
+# Setup environment
