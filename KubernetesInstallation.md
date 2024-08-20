@@ -1,4 +1,4 @@
-### Setup K0s
+# Setup K0s
 ## Initialize Node
 **On node:**
 
