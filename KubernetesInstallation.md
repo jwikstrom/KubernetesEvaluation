@@ -1,50 +1,80 @@
-NODE-------------------------------- init
+## Initialize Node
+**On node:**
 
-sudo apt update
-sudo apt upgrade -y
+    sudo apt update
+    sudo apt upgrade -y
 
-sudo visudo
-(add at bottom of file):
-jw ALL=(ALL) NOPASSWD: ALL
+    sudo visudo
 
-(windows host)-------
-ssh-keygen
-type .\id_rsa.pub | ssh jw@192.168.1.103 "cat >> .ssh/authorized_keys"
+Add following at bottom of file:
+
+    jw ALL=(ALL) NOPASSWD: ALL
+
+## SSH Setup
+
+### If windows host:
+Run with correct *user@ip*
+
+    ssh-keygen
+    type .\id_rsa.pub | ssh jw@192.168.1.103 "cat >> .ssh/authorized_keys"
+
+### If linux host:
+Run with correct *user@ip*
+
+	ssh-keygen
+    ssh-copy-id -i ~/.ssh/id_rsa jw@192.168.1.103
+
 ---------------------
-(linux host)---------
-ssh-keygen
-ssh-copy-id -i ~/.ssh/id_rsa jw@192.168.1.103
----------------------
 
 
-HOST-------------------------------- -Install brew
-sudo apt update
-sudo apt upgrade -y
+## Install brew
+**On host:**
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
---copy two commands from installation:
-(echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> /home/joel/.bashrc
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    sudo apt update
+    sudo apt upgrade -y
+
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+Copy the two commands from installation:
+
+    (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> /home/joel/.bashrc
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
     
-sudo apt-get install build-essential -y
+	sudo apt-get install build-essential -y
 
-HOST-------------------------------- Install kubectl (choose one)
-   curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-   curl -LO "https://dl.k8s.io/release/$(curl -LO https://dl.k8s.io/release/v1.31.0/bin/linux/amd64/kubectl)/bin/linux/amd64/kubectl"
+## Install kubectl
 
-sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+**On host:**
+Choose either latest or specific release:
+   
 
-HOST-------------------------------- -Install & setup k0sctl (installed v1.30.3+k0s.0)
-brew install k0sproject/tap/k0sctl
-k0sctl init > k0sctl.yaml
-(k0sctl init --k0s > k0sctl.yaml)
-k0sctl apply --config k0sctl.yaml -d
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+	curl -LO "https://dl.k8s.io/release/$(curl -LO https://dl.k8s.io/release/v1.31.0/bin/linux/amd64/kubectl)/bin/linux/amd64/kubectl"
 
-mkdir ~/.kube
-k0sctl kubeconfig --config k0sctl.yaml > ~/.kube/config
+Then install with:
 
-kubectl cluster-info
-kubectl get nodes
+    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+## Setup K0sctl
+**On host:**
+(installed v1.30.3+k0s.0)
+
+    brew install k0sproject/tap/k0sctl
+
+Choose one:
+
+	k0sctl init > k0sctl.yaml
+	k0sctl init --k0s > k0sctl.yaml
+Then:
+	
+	k0sctl apply --config k0sctl.yaml -d
+
+    mkdir ~/.kube
+    k0sctl kubeconfig --config k0sctl.yaml > ~/.kube/config
+
+Test:
+
+    kubectl cluster-info
+    kubectl get nodes
 
 END OF STEP 1: Install K0s
-
