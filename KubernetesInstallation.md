@@ -44,6 +44,7 @@ Copy the top two commands from installation:
 ## Install kubectl
 
 **On host:**
+
 Choose either latest or specific release:
    
 
