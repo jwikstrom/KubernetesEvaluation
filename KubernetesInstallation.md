@@ -24,8 +24,6 @@ Run with correct *user@ip*
 	ssh-keygen
     ssh-copy-id -i ~/.ssh/id_rsa jw@192.168.1.103
 
----------------------
-
 
 ## Install brew
 **On host:**
@@ -78,3 +76,4 @@ Test:
     kubectl get nodes
 
 END OF STEP 1: Install K0s
+----------------
