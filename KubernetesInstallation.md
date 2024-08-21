@@ -117,7 +117,10 @@ Then run
 		
 	helm -n default upgrade --install mqtt -f mosquitto_values.yaml t3n/mosquitto
 
+Test
 
+	sudo apt install mosquitto
+ 
 
 
 
