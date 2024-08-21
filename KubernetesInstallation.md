@@ -78,6 +78,7 @@ Test:
     kubectl get nodes
     kubectl get services
     kubectl get pods
+    kubectl get all
     
 
 # Setup environment
