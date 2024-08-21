@@ -79,7 +79,7 @@ Test:
     kubectl get services
     kubectl get pods
     kubectl get all
-    
+    kubectl describe pod XXX
 
 # Setup environment
 
