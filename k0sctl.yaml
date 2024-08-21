@@ -12,22 +12,23 @@ spec:
     role: single
   k0s:
     config:
-      extensions:
-        helm:
-          repositories:
-          - name: stable
-            url: https://charts.helm.sh/stable
-          - name: prometheus-community
-            url: https://prometheus-community.github.io/helm-charts
-          charts:
-          - name: prometheus-stack
-            chartname: prometheus-community/prometheus
-            version: "25.26.0"
-            values: |
-              alertmanager:
-                persistentVolume:
-                  enabled: false
-              server:
-                persistentVolume:
-                  enabled: false
-            namespace: default
+      spec:
+        extensions:
+          helm:
+            repositories:
+            - name: stable
+              url: https://charts.helm.sh/stable
+            - name: prometheus-community
+              url: https://prometheus-community.github.io/helm-charts
+            charts:
+            - name: prometheus-stack
+              chartname: prometheus-community/prometheus
+              version: "25.26.0"
+              values: |
+                alertmanager:
+                  persistentVolume:
+                    enabled: false
+                server:
+                  persistentVolume:
+                    enabled: false
+              namespace: default
