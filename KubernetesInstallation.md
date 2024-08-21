@@ -76,5 +76,47 @@ Test:
 
     kubectl cluster-info
     kubectl get nodes
+    kubectl get services
+    kubectl get pods
+    
 
 # Setup environment
+**On host**
+
+	brew install helm
+
+*Optional - Informatic*
+
+	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+ 	helm search repo prometheus-community
+
+Mosquitto:
+	
+ 	helm repo add t3n https://storage.googleapis.com/t3n-helm-charts
+ 	helm show values t3n/mosquitto > mosquitto_values.yaml
+  Edit mosquitto_values.yaml ~row 20 - 34
+
+  	service:
+	  type: NodePort
+	  externalTrafficPolicy: Cluster
+	  annotations: {}
+	    # metallb.universe.tf/allow-shared-ip: pi-hole
+	
+	ports:
+	  mqtt:
+	    port: 1883
+	    # sets consistent nodePort, required to set service.type=NodePort
+	    nodePort: 31883
+	    protocol: TCP
+	  websocket:
+	    port: 9090
+	    protocol: TCP
+
+helm -n default upgrade --install mqtt -f mosquitto_values.yaml t3n/mosquitto
+
+
+
+
+
+
+
