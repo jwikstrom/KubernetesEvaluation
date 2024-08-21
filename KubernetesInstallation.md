@@ -112,7 +112,7 @@ Mosquitto:
 	    port: 9090
 	    protocol: TCP
 
-helm -n default upgrade --install mqtt -f mosquitto_values.yaml t3n/mosquitto
+	helm -n default upgrade --install mqtt -f mosquitto_values.yaml t3n/mosquitto
 
 
 
