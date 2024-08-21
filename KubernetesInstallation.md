@@ -81,20 +81,21 @@ Test:
     
 
 # Setup environment
+
+## Prometheus - Optional
 **On host**
-
-	brew install helm
-
-*Optional - Informatic*
+Prometheus should already be installed via k0sctl chart.
+This may however be used to see what version to use in earlier chart
 
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
  	helm search repo prometheus-community
 
-Mosquitto:
+## Install Mosquitto
+**On host**
 	
  	helm repo add t3n https://storage.googleapis.com/t3n-helm-charts
  	helm show values t3n/mosquitto > mosquitto_values.yaml
-  Edit mosquitto_values.yaml ~row 20 - 34
+  Edit *mosquitto_values.yaml* ~row 20 - 34
 
   	service:
 	  type: NodePort
@@ -111,7 +112,8 @@ Mosquitto:
 	  websocket:
 	    port: 9090
 	    protocol: TCP
-
+Then run
+		
 	helm -n default upgrade --install mqtt -f mosquitto_values.yaml t3n/mosquitto
 
 
