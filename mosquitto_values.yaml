@@ -34,7 +34,7 @@ ports:
     protocol: TCP
 
 persistence:
-  enabled: true
+  enabled: false
   accessMode: ReadWriteOnce
   existingClaim: ""
   mountPath: /mosquitto/data
