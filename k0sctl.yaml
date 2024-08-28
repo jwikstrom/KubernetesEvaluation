@@ -20,15 +20,19 @@ spec:
               url: https://charts.helm.sh/stable
             - name: prometheus-community
               url: https://prometheus-community.github.io/helm-charts
-            - name: openebs
+            - name: openebs-internal
               url: https://openebs.github.io/charts
             charts:
             - name: openebs
-              chartname: openebs/openebs
-              version: "4.1.0"
+              chartname: openebs-internal/openebs
+              version: "3.9.0"
               namespace: openebs
+              order: 1
               values: |
-                # Add specific values here if needed
+                localprovisioner:
+                  hostpathClass:
+                    enabled: true
+                    isDefaultClass: true
             - name: prometheus-stack
               chartname: prometheus-community/prometheus
               version: "25.26.0"
