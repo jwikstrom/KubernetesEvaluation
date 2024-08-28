@@ -29,7 +29,6 @@ spec:
               namespace: openebs
               values: |
                 # Add specific values here if needed
-
             - name: prometheus-stack
               chartname: prometheus-community/prometheus
               version: "25.26.0"
