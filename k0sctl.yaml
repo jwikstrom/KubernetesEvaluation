@@ -43,6 +43,10 @@ spec:
                     enabled: true
                     storageClass: "openebs-hostpath"
                     size: 10Gi
+
+                    ------
+
+                    
                   extraScrapeConfigs: |
                     - job_name: 'kube-state-metrics'
                       kubernetes_sd_configs:
