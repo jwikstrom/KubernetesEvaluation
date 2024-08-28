@@ -122,6 +122,7 @@ Then run
 	sudo snap install mosquitto
 
 open two terminals and run one command in each:
+
  	mosquitto_sub -h 192.168.1.103 -p 31883 -t testingtopic
 	mosquitto_pub -h 192.168.1.103 -p 31883 -t testingtopic -m "test"
  	
