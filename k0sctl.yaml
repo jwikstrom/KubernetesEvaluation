@@ -20,15 +20,41 @@ spec:
               url: https://charts.helm.sh/stable
             - name: prometheus-community
               url: https://prometheus-community.github.io/helm-charts
+            - name: openebs
+                url: https://openebs.github.io/charts
             charts:
+            - name: openebs
+              chartname: openebs/openebs
+              version: "4.1.0"
+              namespace: openebs
+              values: |
+                # Custom OpenEBS values can be added here
             - name: prometheus-stack
               chartname: prometheus-community/prometheus
               version: "25.26.0"
               values: |
-                alertmanager:
-                  persistentVolume:
-                    enabled: false
                 server:
                   persistentVolume:
-                    enabled: false
-              namespace: default
+                    enabled: true
+                    storageClass: "openebs-hostpath"
+                    size: 10Gi
+                # Include extra scrape configs as needed
+                 extraScrapeConfigs: |
+                   - job_name: 'kube-state-metrics'
+                     kubernetes_sd_configs:
+                       - role: endpoints
+                     relabel_configs:
+                       - source_labels: [__meta_kubernetes_service_label_app]
+                         action: keep
+                         regex: kube-state-metrics
+                   - job_name: 'node-exporter'
+                     kubernetes_sd_configs:
+                       - role: node
+                     relabel_configs:
+                       - action: labelmap
+                         regex: __meta_kubernetes_node_label_(.+)
+                       - target_label: __address__
+                         replacement: kubernetes.default.svc:9100
+                       - source_labels: [__meta_kubernetes_node_name]
+                         target_label: instance
+               namespace: default
