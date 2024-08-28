@@ -20,14 +20,14 @@ spec:
               url: https://charts.helm.sh/stable
             - name: prometheus-community
               url: https://prometheus-community.github.io/helm-charts
-            - name: openebs-internal
-              url: https://openebs.github.io/charts
+            - name: openebs
+              url: https://openebs.github.io/openebs
             charts:
             - name: openebs
-              chartname: openebs-internal/openebs
-              version: "3.9.0"
+              chartname: openebs/openebs
+              version: "4.1.0"
               namespace: openebs
-              order: 1
+              order: 2
               values: |
                 localprovisioner:
                   hostpathClass:
@@ -37,12 +37,18 @@ spec:
               chartname: prometheus-community/prometheus
               version: "25.26.0"
               namespace: default
+              order: 1
               values: |
                 server:
                   persistentVolume:
                     enabled: true
                     storageClass: "openebs-hostpath"
-                    size: 10Gi
+                    size: 5Gi
+                service:
+                  enabled: true
+                  type: NodePort
+                  nodePort: 30000
+                  
 
                     ------
 
