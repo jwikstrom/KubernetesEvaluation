@@ -83,7 +83,8 @@ Test:
 # Setup environment
 
 ## Prometheus - Optional
-**On separate**
+**On separate:**
+
 Prometheus should already be installed via k0sctl chart.
 This may however be used to see what version to use in earlier chart
 
@@ -91,7 +92,7 @@ This may however be used to see what version to use in earlier chart
  	helm search repo prometheus-community
 
 ## Install Mosquitto
-**On separate**
+**On separate:**
 	
  	helm repo add t3n https://storage.googleapis.com/t3n-helm-charts
  	helm show values t3n/mosquitto > mosquitto_values.yaml
@@ -117,7 +118,7 @@ Then run
 	helm -n default upgrade --install mqtt -f mosquitto_values.yaml t3n/mosquitto
 
 ### Testing the mosquitto broker
-**On separate**
+**On separate:**
 
 	sudo snap install mosquitto
 
