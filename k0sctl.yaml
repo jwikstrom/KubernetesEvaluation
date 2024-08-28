@@ -28,7 +28,6 @@ spec:
               version: "4.1.0"
               namespace: openebs
               values: |
-                # Custom OpenEBS values can be added here
             - name: prometheus-stack
               chartname: prometheus-community/prometheus
               version: "25.26.0"
@@ -38,7 +37,6 @@ spec:
                     enabled: true
                     storageClass: "openebs-hostpath"
                     size: 10Gi
-                # Include extra scrape configs as needed
                  extraScrapeConfigs: |
                    - job_name: 'kube-state-metrics'
                      kubernetes_sd_configs:
