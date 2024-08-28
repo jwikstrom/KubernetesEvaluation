@@ -13,13 +13,13 @@ Add following at bottom of file:
 
 ## SSH Setup
 
-### If windows host:
+### If windows separate machine:
 Run with correct *user@ip*
 
     ssh-keygen
     type .\id_rsa.pub | ssh jw@192.168.1.103 "cat >> .ssh/authorized_keys"
 
-### If linux host:
+### If linux separate machine:
 Run with correct *user@ip*
 
 	ssh-keygen
@@ -27,7 +27,7 @@ Run with correct *user@ip*
 
 
 ## Install brew
-**On host:**
+**On separate:**
 
     sudo apt update
     sudo apt upgrade -y
@@ -42,8 +42,7 @@ Copy the top two commands from installation:
 	sudo apt-get install build-essential -y
 
 ## Install kubectl
-
-**On host:**
+**On separate:**
 
 Choose either latest or specific release:
    
@@ -56,7 +55,7 @@ Then install with:
     sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
 ## Setup K0sctl
-**On host:**
+**On separate:**
 (installed v1.30.3+k0s.0)
 
     brew install k0sproject/tap/k0sctl
@@ -84,7 +83,7 @@ Test:
 # Setup environment
 
 ## Prometheus - Optional
-**On host**
+**On separate**
 Prometheus should already be installed via k0sctl chart.
 This may however be used to see what version to use in earlier chart
 
@@ -92,7 +91,7 @@ This may however be used to see what version to use in earlier chart
  	helm search repo prometheus-community
 
 ## Install Mosquitto
-**On host**
+**On separate**
 	
  	helm repo add t3n https://storage.googleapis.com/t3n-helm-charts
  	helm show values t3n/mosquitto > mosquitto_values.yaml
@@ -117,9 +116,15 @@ Then run
 		
 	helm -n default upgrade --install mqtt -f mosquitto_values.yaml t3n/mosquitto
 
-Test
+### Testing the mosquitto broker
+**On separate**
 
-	sudo apt install mosquitto
+	sudo snap install mosquitto
+
+open two terminals and run one command in each:
+ 	mosquitto_sub -h 192.168.1.103 -p 31883 -t testingtopic
+	mosquitto_pub -h 192.168.1.103 -p 31883 -t testingtopic -m "test"
+ 	
  
 
 
