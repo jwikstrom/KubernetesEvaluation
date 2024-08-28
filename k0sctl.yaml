@@ -28,9 +28,12 @@ spec:
               version: "4.1.0"
               namespace: openebs
               values: |
+                # Add specific values here if needed
+
             - name: prometheus-stack
               chartname: prometheus-community/prometheus
               version: "25.26.0"
+              namespace: default
               values: |
                 server:
                   persistentVolume:
@@ -55,4 +58,3 @@ spec:
                           replacement: kubernetes.default.svc:9100
                         - source_labels: [__meta_kubernetes_node_name]
                           target_label: instance
-              namespace: default
