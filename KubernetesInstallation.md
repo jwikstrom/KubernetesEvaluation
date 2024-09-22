@@ -1,3 +1,4 @@
+
 # Setup K0s
 ## Initialize Node
 **On node:**
@@ -92,14 +93,26 @@ To uninstall, run:
 
 # Setup environment
 
-## Prometheus - Optional
+## Prometheus
 **On separate:**
 
-Prometheus should already be installed via k0sctl chart.
-This may however be used to see what version to use in earlier chart
+Prometheus is used for monitoring.
 
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
- 	helm search repo prometheus-community
+	helm repo update
+To see latest versions - *optional*:
+
+	helm search repo prometheus-community
+To get the values yaml file:
+
+	helm show values prometheus-community/kube-prometheus-stack > promvalues.yaml
+
+Edit the file so that prometheus.service.type = NodePort
+The port should already be *30903*, otherwise edit prometheus.service.nodePort = 30903
+
+Then install with:
+
+	helm install prometheus prometheus-community/kube-prometheus-stack -f promvalues.yaml
 
 ## Install Mosquitto
 **On separate:**
