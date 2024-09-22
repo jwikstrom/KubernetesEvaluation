@@ -116,6 +116,14 @@ Then install with:
 ### Uninstall
 	helm uninstall prometheus prometheus-community/kube-prometheus-stack
 
+## Grafana
+On a machine that is on the same subnet as the node with prometheus:
+
+ 1. Follow instructions to install grafana on [prometheus docs](https://prometheus.io/docs/visualization/grafana/)
+ 2. Add Data source Prometheus for http://192.168.1.103:30090/
+	 a. http://\<Node Ip>:\<Prometheus NodePort port>
+ 3. Import dashboards [ID 13332](https://grafana.com/grafana/dashboards/13332-kube-state-metrics-v2/) and [ID 1860](https://grafana.com/grafana/dashboards/1860-node-exporter-full/)
+
 ## Install Mosquitto
 **On separate:**
 	
