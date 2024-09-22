@@ -107,8 +107,8 @@ To get the values yaml file:
 
 	helm show values prometheus-community/kube-prometheus-stack > promvalues.yaml
 
-Edit the file so that prometheus.service.type = NodePort
-The port should already be *30903*, otherwise edit prometheus.service.nodePort = 30903
+Edit the file so that prometheus.service.type = NodePort 
+The port should already be *30090*, otherwise edit prometheus.service.nodePort = 30090
 
 Then install with:
 
