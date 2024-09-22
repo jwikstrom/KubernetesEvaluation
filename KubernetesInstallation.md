@@ -67,6 +67,8 @@ Choose one:
 
 	k0sctl init > k0sctl.yaml
 	k0sctl init --k0s > k0sctl.yaml
+ 	
+  	# Or copy paste contents from k0sctl.yaml from this git repo
 Then:
 	
 	k0sctl apply --config k0sctl.yaml -d
