@@ -14,7 +14,7 @@ Add following at bottom of file:
 ## SSH Setup
 
 ### If windows separate machine:
-Run with correct *user@ip*
+Run with correct *nodeuser@nodeip*
 
     ssh-keygen
     type .\id_rsa.pub | ssh jw@192.168.1.103 "cat >> .ssh/authorized_keys"
@@ -25,6 +25,9 @@ Run with correct *user@ip*
 	ssh-keygen
     ssh-copy-id -i ~/.ssh/id_rsa jw@192.168.1.103
 
+### Access to node:
+
+	ssh jw@192.168.1.103
 
 ## Install brew
 **On separate:**
