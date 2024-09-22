@@ -85,7 +85,7 @@ Test:
     kubectl get all
     kubectl describe pod XXX
 
-###Uninstall
+### Uninstall
 To uninstall, run:
 
 	k0sctl reset
