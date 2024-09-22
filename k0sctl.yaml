@@ -12,8 +12,9 @@ spec:
     role: single
   k0s:
     config:
-      extensions:
-        helm:
-          repositories:
-          - name: stable
-            url: https://charts.helm.sh/stable
+      spec:
+        extensions:
+          helm:
+            repositories:
+            - name: stable
+              url: https://charts.helm.sh/stable
