@@ -85,6 +85,11 @@ Test:
     kubectl get all
     kubectl describe pod XXX
 
+###Uninstall
+To uninstall, run:
+
+	k0sctl reset
+
 # Setup environment
 
 ## Prometheus - Optional
