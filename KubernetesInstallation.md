@@ -113,6 +113,8 @@ The port should already be *30090*, otherwise edit prometheus.service.nodePort =
 Then install with:
 
 	helm install prometheus prometheus-community/kube-prometheus-stack -f promvalues.yaml
+### Uninstall
+	helm uninstall prometheus prometheus-community/kube-prometheus-stack
 
 ## Install Mosquitto
 **On separate:**
