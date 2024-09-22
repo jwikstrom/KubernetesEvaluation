@@ -10,3 +10,10 @@ spec:
       port: 22
       keyPath: /home/joel/.ssh/id_rsa
     role: single
+  k0s:
+    config:
+      extensions:
+    helm:
+      repositories:
+      - name: stable
+        url: https://charts.helm.sh/stable
