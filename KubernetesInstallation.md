@@ -162,7 +162,8 @@ open two terminals and run one command in each:
 
  	mosquitto_sub -h 192.168.1.103 -p 31883 -t testingtopic
 	mosquitto_pub -h 192.168.1.103 -p 31883 -t testingtopic -m "test"
- 	
+	
+# Setup Subscriber
  ## Docker
 Build the docker image in the same directory as dockerfile:
 
@@ -181,7 +182,27 @@ Updating docker image:
 
 	docker build -t bananpannkaka/mqtt_subscriber:latest .
 	docker push bananpannkaka/mqtt_subscriber:latest
+## Kubernetes
 
+Make sure you have a deployment.yaml file for the subscriber, then run:
 
+	kubectl apply -f deployment.yaml
 
+Verify it is up and running then to see logs run:
 
+	kubectl logs -l app=mqtt-subscriber
+	#----------OR---------
+	kubectl logs <pod-name>
+
+Or to see live logs:
+
+	kubectl logs -f -l app=mqtt-subscriber
+	#----------OR---------
+	kubectl logs -f <pod-name>
+
+To update pod with a new docker image remove the pod wait until a new pod appears
+
+	kubectl delete pod -l app=mqtt-subscriber
+To delete the deployment, do:
+
+	kubectl delete deployment mqtt-subscriber-deployment
