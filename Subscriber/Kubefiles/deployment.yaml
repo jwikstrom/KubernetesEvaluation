@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-subscriber-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-subscriber
+  template:
+    metadata:
+      labels:
+        app: mqtt-subscriber
+    spec:
+      containers:
+      - name: mqtt-subscriber
+        image: bananpannkaka/mqtt_subscriber:latest
+        env:
+        - name: MQTT_BROKER
+          value: "tcp://192.168.1.103:31883"  # Set the MQTT broker address here
+        - name: MQTT_TOPICS
+          value: "test/GPS_Tracker,test/Thermostat_Sensor,test/Weather_Station"  # Comma-separated topics
