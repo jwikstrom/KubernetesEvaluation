@@ -163,8 +163,19 @@ open two terminals and run one command in each:
  	mosquitto_sub -h 192.168.1.103 -p 31883 -t testingtopic
 	mosquitto_pub -h 192.168.1.103 -p 31883 -t testingtopic -m "test"
  	
- 
+ ## Docker
+Build the docker image in the same directory as dockerfile:
 
+	docker build -t  mqtt_subscriber .
+	
+Test container:
+
+	docker run --rm  mqtt_subscriber
+Push to Docker hub:
+
+	docker login
+	docker tag mqtt_subscriber bananpannkaka/mqtt_subscriber:latest
+	docker push bananpannkaka/mqtt_subscriber:latest
 
 
 
