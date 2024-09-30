@@ -177,6 +177,11 @@ Push to Docker hub:
 	docker tag mqtt_subscriber bananpannkaka/mqtt_subscriber:latest
 	docker push bananpannkaka/mqtt_subscriber:latest
 
+Updating docker image:
+
+	docker build -t bananpannkaka/mqtt_subscriber:latest .
+	docker push bananpannkaka/mqtt_subscriber:latest
+
 
 
 
