@@ -186,7 +186,7 @@ Updating docker image:
 
 Make sure you have a deployment.yaml file for the subscriber, then run:
 
-	kubectl apply -f deployment.yaml
+	kubectl apply -f subscriberDeployment.yaml
 
 Verify it is up and running then to see logs run:
 
