@@ -17,3 +17,16 @@ CNI plugins:
 	mkdir -p /opt/cni/bin
 	
 	sudo tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.6.0.tgz
+
+Configure Containerd:
+
+	sudo mkdir -p /etc/containerd
+	containerd config default | sudo tee /etc/containerd/config.toml
+
+Start containerd:
+
+	cd /usr/lib/systemd/system
+	sudo wget "https://raw.githubusercontent.com/containerd/containerd/main/containerd.service"
+	systemctl daemon-reload
+	systemctl enable --now containerd
+	
