@@ -125,7 +125,7 @@ On a machine that is on the same subnet as the node with prometheus:
 	- http://\<Node Ip>:\<Prometheus NodePort port>
  4. Import dashboards [ID 13332](https://grafana.com/grafana/dashboards/13332-kube-state-metrics-v2/) and [ID 1860](https://grafana.com/grafana/dashboards/1860-node-exporter-full/)
 
-
+(login admin/joel)
 
 ## Install Mosquitto
 **On separate:**
