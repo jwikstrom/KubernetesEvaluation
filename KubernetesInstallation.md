@@ -45,6 +45,8 @@ Copy the top two commands from installation:
     
 	sudo apt-get install build-essential -y
 
+ 	brew install gcc
+
 ## Install kubectl
 **On separate:**
 
