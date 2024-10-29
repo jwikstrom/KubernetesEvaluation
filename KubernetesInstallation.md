@@ -18,7 +18,7 @@ Add following at bottom of file:
 Run with correct *nodeuser@nodeip*
 
     ssh-keygen
-    type .\id_rsa.pub | ssh jw@192.168.1.103 "cat >> .ssh/authorized_keys"
+    type .\.ssh\id_rsa.pub | ssh jw@192.168.1.103 "cat >> .ssh/authorized_keys"
 
 ### If linux separate machine:
 Run with correct *user@ip*
