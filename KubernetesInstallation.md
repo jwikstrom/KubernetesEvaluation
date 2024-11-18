@@ -1,4 +1,5 @@
 
+
 # Setup K0s
 ## Initialize Node
 **On node:**
@@ -60,7 +61,7 @@ Then install with:
 
     sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
-## Setup K0sctl
+## Setup K0sctl (Deprecated -  use k0s installation instead)
 **On separate:**
 (installed v1.30.3+k0s.0)
 
@@ -85,13 +86,42 @@ Test:
     kubectl get nodes
     kubectl get services
     kubectl get pods
-    kubectl get all
+    kubectl get all -A
     kubectl describe pod XXX
 
 ### Uninstall
 To uninstall, run:
 
 	k0sctl reset
+
+# Setup k0s without k0sctl (not currently working)
+	curl --proto '=https' --tlsv1.2 https://get.k0s.sh | sudo K0S_VERSION=v1.31.2+k0s.0 sh
+	mkdir  -p  /etc/k0s
+	sudo sh -c "k0s config create > /etc/k0s/k0s.yaml"
+	sudo k0s install controller --single --force -c /etc/k0s/k0s.yaml -v --cri-socket=remote:unix:///var/run/containerd/containerd.sock
+	--cri-socket /run/containerd/containerd.sock --pod-network-cidr=10.244.0.0/16
+	# --cri-socket=remote:unix:///var/run/containerd/containerd.sock
+	sudo systemctl daemon-reload
+	sudo k0s start
+	
+	sudo k0s status
+	sudo k0s kubectl get all -A
+
+Re-install:
+
+	sudo systemctl stop k0scontroller
+	sudo systemctl disable k0scontroller
+	sudo rm /etc/systemd/system/k0scontroller.service
+	sudo systemctl daemon-reload
+
+	sudo k0s install controller --single -c /etc/k0s/k0s.yaml -v --cri-socket=remote:unix:///var/run/containerd/containerd.sock
+
+
+crictl
+	
+	wget "https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.31.1/crictl-v1.31.1-linux-386.tar.gz"
+	sudo tar zxvf crictl-v1.31.1-linux-386.tar.gz -C /usr/local/bin/
+	
 
 # Setup environment
 
