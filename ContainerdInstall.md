@@ -58,7 +58,7 @@ Useful links:
 	
 
     sudo mkdir -p /opt/kata/
-    sudo tar Cxf / kata-static-3.10.1-amd64.tar.xz
+    sudo tar -C /opt/kata/ -xf kata-static-3.10.1-amd64.tar.xz
     sudo ln -s /opt/kata/bin/containerd-shim-kata-v2 /usr/local/bin/containerd-shim-kata-v2
     sudo ln -s /opt/kata/bin/kata-collect-data.sh /usr/local/bin/kata-collect-data
     sudo ln -s /opt/kata/bin/kata-runtime /usr/local/bin/kata-runtime
@@ -92,8 +92,14 @@ Set runtime to use in config.toml:
 				default_runtime_name = "REPLACEWITHRUNTIMENAME"
 				[plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
 				
-					[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.kata]
+					[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.kata]
 				          runtime_type = "io.containerd.kata.v2"
+				          runtime_engine = "/usr/local/bin/kata-runtime"
+				          runtime_root = "/run/containerd/kata-containers"
+				
+				          [plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.kata.options]
+				            BinaryName = '/usr/local/bin/containerd-shim-kata-v2
+				            SystemdCgroup = true
 				          
 				    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.crun]
 						runtime_type = "io.containerd.runc.v2"
