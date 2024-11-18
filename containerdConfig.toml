@@ -116,7 +116,7 @@ version = 2
           cni_max_conf_num = 0
           container_annotations = []
           pod_annotations = []
-          privileged_without_host_devices = false
+          privileged_without_host_devices = true
           privileged_without_host_devices_all_devices_allowed = false
           runtime_engine = ""
           runtime_path = ""
@@ -126,7 +126,7 @@ version = 2
           snapshotter = ""
 
           [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.kata.options]
-            BinaryName = ""
+            BinaryName = "/usr/local/bin/system/kata-runtime"
             CriuImagePath = ""
             CriuPath = ""
             CriuWorkPath = ""
