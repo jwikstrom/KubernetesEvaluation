@@ -94,11 +94,11 @@ Set runtime to use in config.toml:
 				
 					[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.kata]
 				          runtime_type = "io.containerd.kata.v2"
-				          runtime_engine = "/usr/local/bin/kata-runtime"
-				          runtime_root = "/run/containerd/kata-containers"
+				          privileged_without_host_devices = true
+				          privileged_without_host_devices_all_devices_allowed = true
 				
 				          [plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.kata.options]
-				            BinaryName = '/usr/local/bin/containerd-shim-kata-v2
+				            BinaryName = '/usr/local/bin/containerd-shim-kata-v2'
 				            SystemdCgroup = true
 				          
 				    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.crun]
