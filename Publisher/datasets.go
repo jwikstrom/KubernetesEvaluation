@@ -31,7 +31,7 @@ type WeatherDataParams struct {
 	Humidity    float64 `json:"humidity"`
 }
 
-const fileSets = 5
+const fileSets = 16
 
 func generateFilePaths(basePath, fileType string) [][]string {
 	var filePaths [][]string
@@ -48,6 +48,15 @@ func generateFilePaths(basePath, fileType string) [][]string {
 			fmt.Sprintf("%s/%s_1.log", copyPath, fileType),
 			fmt.Sprintf("%s/%s_2.log", copyPath, fileType),
 			fmt.Sprintf("%s/%s_3.log", copyPath, fileType),
+			fmt.Sprintf("%s/%s_4.log", copyPath, fileType),
+			fmt.Sprintf("%s/%s_5.log", copyPath, fileType),
+			fmt.Sprintf("%s/%s_6.log", copyPath, fileType),
+			fmt.Sprintf("%s/%s_7.log", copyPath, fileType),
+			fmt.Sprintf("%s/%s_8.log", copyPath, fileType),
+			fmt.Sprintf("%s/%s_9.log", copyPath, fileType),
+			fmt.Sprintf("%s/%s_10.log", copyPath, fileType),
+			fmt.Sprintf("%s/%s_11.log", copyPath, fileType),
+			fmt.Sprintf("%s/%s_12.log", copyPath, fileType),
 		})
 	}
 	return filePaths

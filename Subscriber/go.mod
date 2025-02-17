@@ -1,4 +1,4 @@
-module mqtt_subscriber
+module mqtt-subscriber
 
 go 1.23.1
 
