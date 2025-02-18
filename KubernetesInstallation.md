@@ -95,7 +95,7 @@ To uninstall, run:
 	k0sctl reset
 
 # Setup k0s without k0sctl (not currently working)
-	curl --proto '=https' --tlsv1.2 https://get.k0s.sh | sudo K0S_VERSION=v1.31.2+k0s.0 sh
+	curl --proto '=https' --tlsv1.2 https://get.k0s.sh | sudo K0S_VERSION=v1.32.1+k0s.0 sh
 	mkdir  -p  /etc/k0s
 	sudo sh -c "k0s config create > /etc/k0s/k0s.yaml"
 	sudo k0s install controller --single --force -c /etc/k0s/k0s.yaml -v --cri-socket=remote:unix:///var/run/containerd/containerd.sock
@@ -106,6 +106,10 @@ To uninstall, run:
 	
 	sudo k0s status
 	sudo k0s kubectl get all -A
+	sudo nano /run/k0s/containerd-cri.toml
+
+	sudo k0s stop
+	sudo systemctl restart k0scontroller
 
 Re-install:
 
@@ -122,8 +126,22 @@ crictl
 	wget "https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.31.1/crictl-v1.31.1-linux-386.tar.gz"
 	sudo tar zxvf crictl-v1.31.1-linux-386.tar.gz -C /usr/local/bin/
 	
+Use kubectl directly (rq for helm):
+
+	export KUBECONFIG=/var/lib/k0s/pki/admin.conf
+	## OR
+	sudo cp /var/lib/k0s/pki/admin.conf ~/.kube/config
+	
+	## Then
+	sudo chmod 644 /var/lib/k0s/pki/admin.conf
 
 # Setup environment
+## Helm
+Get latest version automatically:
+
+	curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+	chmod 700 get_helm.sh
+	./get_helm.sh
 
 ## Prometheus
 **On separate:**
@@ -139,10 +157,21 @@ To get the values yaml file:
 
 	helm show values prometheus-community/kube-prometheus-stack > promvalues.yaml
 
-Edit the file so that prometheus.service.type = NodePort 
-The port should already be *30090*, otherwise edit prometheus.service.nodePort = 30090
+**yq:**
 
-Then install with:
+	## Install
+	sudo apt install -y yq
+	
+	## Check existing values:
+	sudo yq -r '.prometheus.service.type' promvalues.yaml
+	sudo yq -r '.prometheus.service.nodePort' promvalues.yaml
+
+	## Update values:
+	yq -y -i '.prometheus.service.type = "NodePort"' promvalues.yaml
+	yq -y -i '.prometheus.service.nodePort = 30090' promvalues.yaml	
+
+
+Then install prometheus with:
 
 	helm install prometheus prometheus-community/kube-prometheus-stack -f promvalues.yaml
 ### Uninstall
@@ -157,30 +186,27 @@ On a machine that is on the same subnet as the node with prometheus:
 	- http://\<Node Ip>:\<Prometheus NodePort port>
  4. Import dashboards [ID 13332](https://grafana.com/grafana/dashboards/13332-kube-state-metrics-v2/) and [ID 1860](https://grafana.com/grafana/dashboards/1860-node-exporter-full/)
 
-(login admin/joel)
+*(login admin/joel)*
 
 ## Install Mosquitto
 **On separate:**
 	
  	helm repo add t3n https://storage.googleapis.com/t3n-helm-charts
  	helm show values t3n/mosquitto > mosquitto_values.yaml
-  Edit *mosquitto_values.yaml* ~row 20 - 34
 
-  	service:
-	  type: NodePort
-	  externalTrafficPolicy: Cluster
-	  annotations: {}
-	    # metallb.universe.tf/allow-shared-ip: pi-hole
+**yq**
+
+	##Check values:
+	yq -r '.service.type' mosquitto_values.yaml
+	yq -r '.ports.mqtt.nodePort' mosquitto_values.yaml
+	yq -r '.persistence.enabled' mosquitto_values.yaml
 	
-	ports:
-	  mqtt:
-	    port: 1883
-	    # sets consistent nodePort, required to set service.type=NodePort
-	    nodePort: 31883
-	    protocol: TCP
-	  websocket:
-	    port: 9090
-	    protocol: TCP
+	## Update values:
+	yq -y -i '.service.type = "NodePort"' mosquitto_values.yaml
+	yq -y -i '.ports.mqtt.nodePort = 31883' mosquitto_values.yaml
+	yq -y -i '.persistence.enabled = "false"' mosquitto_values.yaml
+
+  
 Then run
 		
 	helm -n default upgrade --install mqtt -f mosquitto_values.yaml t3n/mosquitto
@@ -197,6 +223,8 @@ open two terminals and run one command in each:
 	
 # Setup Subscriber
  ## Docker
+Step one: Start Docker.
+
 Build the docker image in the same directory as dockerfile:
 
 	docker build -t  mqtt_subscriber .
