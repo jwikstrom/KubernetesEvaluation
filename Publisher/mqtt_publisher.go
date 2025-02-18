@@ -25,10 +25,12 @@ var (
 )
 
 const numRuns = 1  //2 ~ 1 min || med 1ms delay => ca 7,5 min
-const datasets = 10 // 1 dataset = 3 topics
+const datasets = 8 // 1 dataset = 3 topics
 
 const initialSleep = 1000 * time.Millisecond
-const realtimedelay = 1 * time.Millisecond
+const realtimedelay = 50000 * time.Nanosecond
+
+const runTime = 180 * time.Second
 
 func main() {
 	var wg sync.WaitGroup
@@ -74,7 +76,7 @@ func processDataset(datasetName string, files []string, topic string, dataConstr
 	// Create a new MQTT client for each dataset
 	clientID := fmt.Sprintf("go_mqtt_client_%s", datasetName)
 	opts := MQTT.NewClientOptions()
-	opts.Order = false
+	opts.SetOrderMatters(false)
 	opts.AddBroker(mqttBroker)
 	opts.SetClientID(clientID)
 
@@ -118,12 +120,25 @@ func processDataset(datasetName string, files []string, topic string, dataConstr
 	// Wait for 1 second before starting the transmission
 	time.Sleep(initialSleep)
 	// Loop through the scanners to process each line
+	startTime := time.Now()
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+
+	go func() {
+		for range ticker.C {
+			fmt.Printf("[%s] %s:\tProgress: %d messages sent\n", time.Now().Format(timeFormat), topic, messageCount)
+		}
+	}()
+
 	for i, scanner := range scanners {
 		if i%filesCount == 0 && i != 0 {
 			runs++
 			fmt.Printf("[%s] %s:\tRun:%v\n", time.Now().Format(timeFormat), topic, runs)
 		}
 		for scanner.Scan() {
+			if time.Since(startTime) >= runTime {
+				break
+			}
 			line := scanner.Text()
 
 			// Parse the JSON line into the dataset-specific struct
@@ -151,6 +166,9 @@ func processDataset(datasetName string, files []string, topic string, dataConstr
 		if err := scanner.Err(); err != nil {
 			log.Fatalf("[%s] %s: Error reading file: %v", time.Now().Format(timeFormat), topic, err)
 		}
+		if time.Since(startTime) >= runTime {
+			break
+		}
 	}
 
 	// Send final message with id: 99 and the current time
@@ -165,31 +183,10 @@ func processDataset(datasetName string, files []string, topic string, dataConstr
 	duration := finalTime.Sub(initialTimeFormatted)
 	fmt.Printf("[%s] %s:\tFinal message sent. Total messages sent: %d. Duration: %v\n", finalTime.Format(timeFormat), topic, messageCount, duration)
 
-	ackTopic := fmt.Sprintf("%s/ack", topic)
-	ackReceived := make(chan struct{})
-	client.Subscribe(ackTopic, 0, func(client MQTT.Client, msg MQTT.Message) {
-		fmt.Printf("[%s] %s:\tACK received\n", time.Now().Format(timeFormat), topic)
-		ackReceived <- struct{}{}
-	})
-
-	// Wait for the ack message
-	fmt.Printf("[%s] %s:\tWaiting for ack on topic: %s\n", time.Now().Format(timeFormat), topic, ackTopic)
-	select {
-	case <-ackReceived:
-		// ACK received, calculate the time difference
-		finalTime := time.Now()
-		duration := finalTime.Sub(finalTimeSentClean)
-		totalDuration := finalTime.Sub(initialTimeClean)
-
-		mutex.Lock()
-		durations[topic] = duration
-		totalDurations[topic] = totalDuration
-		mutex.Unlock()
-	case <-time.After(5 * time.Minute):
-		// Timeout waiting for ACK
-		fmt.Printf("[%s] %s:\tTimeout waiting for ack\n", time.Now().Format(timeFormat), topic)
-	}
-
+	mutex.Lock()
+	durations[topic] = duration
+	totalDurations[topic] = finalTimeSentClean.Sub(initialTimeClean)
+	mutex.Unlock()
 }
 
 // Helper function to set the current time in the dataset

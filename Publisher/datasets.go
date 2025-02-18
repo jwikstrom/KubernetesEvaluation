@@ -15,10 +15,10 @@ type GPSDataParams struct {
 type ThermostatDataParams struct {
 	CurrentTime        string  `json:"current_time"`
 	ID                 int     `json:"id"`
-	DeviceTitle        string  `json:"device_title"`
-	CurrentTemperature float64 `json:"current_temperature"`
+	DeviceTitle        string  `json:"device title"`
+	CurrentTemperature float64 `json:"current temperature"`
 	AC_State           bool    `json:"AC_state"`
-	StateOfThermostat  string  `json:"state_of_thermostat"`
+	StateOfThermostat  string  `json:"state of thermostat"`
 }
 
 // WeatherDataParams represents the parameters for weather data
@@ -64,7 +64,7 @@ func generateFilePaths(basePath, fileType string) [][]string {
 
 // File lists for each dataset
 var (
-	GPSLogFiles        = generateFilePaths("../../Testdata/Files", "IoT_normal_GPS_Tracker")
-	WeatherLogFiles    = generateFilePaths("../../Testdata/Files", "IoT_normal_Weather")
-	ThermostatLogFiles = generateFilePaths("../../Testdata/Files", "IoT_normal_Thermostat")
+	GPSLogFiles        = generateFilePaths("../Testdata/Files", "IoT_normal_GPS_Tracker")
+	WeatherLogFiles    = generateFilePaths("../Testdata/Files", "IoT_normal_Weather")
+	ThermostatLogFiles = generateFilePaths("../Testdata/Files", "IoT_normal_Thermostat")
 )

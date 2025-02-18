@@ -16,10 +16,10 @@ import (
 type Message struct {
 	CurrentTime        string  `json:"current_time"`
 	ID                 int     `json:"id"`
-	DeviceTitle        string  `json:"device_title"`
-	CurrentTemperature float64 `json:"current_temperature"`
+	DeviceTitle        string  `json:"device title"`
+	CurrentTemperature float64 `json:"current temperature"`
 	AC_State           bool    `json:"AC_state"`
-	StateOfThermostat  string  `json:"state_of_thermostat"`
+	StateOfThermostat  string  `json:"state of thermostat"`
 }
 
 // MQTT settings
@@ -44,8 +44,10 @@ var (
 	maxTemperatureChan  = make(chan float64, 100)
 )
 
-const defaultTopicSets = 16
-const expectedMessages = 1500741
+const defaultTopicSets = 8
+
+// const expectedMessages = 1500741
+const inactivityTimeout = 15 * time.Second
 
 func main() {
 
@@ -55,6 +57,13 @@ func main() {
 	tempVarianceSumChan <- 0
 	minTemperatureChan <- 9999
 	maxTemperatureChan <- -9999
+
+	// Ensure channels are closed when main exits
+	defer close(totalTempChan)
+	defer close(messageCounterChan)
+	defer close(tempVarianceSumChan)
+	defer close(minTemperatureChan)
+	defer close(maxTemperatureChan)
 
 	// Read the broker address from the environment variable
 	mqttBroker := os.Getenv("MQTT_BROKER")
@@ -81,6 +90,7 @@ func main() {
 
 	// Create a new MQTT client
 	opts := MQTT.NewClientOptions()
+	opts.SetOrderMatters(false)
 	opts.AddBroker(mqttBroker)
 
 	// Set up callback to handle connection loss
@@ -110,14 +120,44 @@ func main() {
 }
 
 func subscribeToTopic(client MQTT.Client, topic string) {
-	var initialSubTime, finalSubTime time.Time
-	var initialPubTime, finalPubTime time.Time
+	// var initialSubTime time.Time
+	// var initialPubTime time.Time
 	var receivedTime, publishedTime time.Time
 	var messageCount int
 	var transmissionTimes []time.Duration // Track transmission times for this topic
 
+	// Create a timer for inactivity detection
+	inactivityTimer := time.NewTimer(inactivityTimeout)
+
+	// Function to handle inactivity timeout
+	handleInactivity := func() {
+		if messageCount == 0 {
+			log.Printf("[%s] %s: No messages received for %v\n", time.Now().Format(timeFormat), topic, inactivityTimeout)
+			return
+		}
+
+		finalSubTime := time.Now()
+		// finalPubTime := initialPubTime.Add(finalSubTime.Sub(initialSubTime))
+
+		// subDuration := finalSubTime.Sub(initialSubTime)
+		// pubDuration := finalPubTime.Sub(initialPubTime)
+		// totalDuration := finalSubTime.Sub(initialPubTime)
+
+		fmt.Printf("[%s] %s:\tTotal received: %d\n",
+			finalSubTime.Format(timeFormat), topic,
+			messageCount)
+		// fmt.Printf("[%s] %s:\tTotal received: %d. || SubDuration: %v, PubDuration: %v, TotalDuration: %v, AvgTransmissionTime: %v \n",
+		// 	finalSubTime.Format(timeFormat), topic,
+		// 	messageCount, subDuration, pubDuration, totalDuration, getAverageTransmissionTime(transmissionTimes))
+
+		messageCount = 0
+		transmissionTimes = []time.Duration{} // Empty the transmissionTimes slice
+	}
+
 	// Create a message handler for the subscription
 	messageHandler := func(client MQTT.Client, msg MQTT.Message) {
+
+		inactivityTimer.Reset(inactivityTimeout)
 
 		// Parse the received message into the Message struct
 		var receivedMsg Message
@@ -132,32 +172,19 @@ func subscribeToTopic(client MQTT.Client, topic string) {
 		//fmt.Printf("[%s] %s:\t %v %s\n", receivedTime.Format(timeFormat), topic, len(transmissionTimes), string(msg.Payload()))
 
 		if receivedMsg.ID == 0 {
-			// Initial message (id: 0)
+			// Initial message (id: 0) used to clear the previous run
 			messageCount = 0
 			transmissionTimes = []time.Duration{} // Empty the transmissionTimes slice
 
-			fmt.Printf("[%s] %s:\tReceived initial message\n", time.Now().Format(timeFormat), topic)
-		} else if messageCount >= expectedMessages {
-			fmt.Printf("[%s] %s:\t %v %s\n", receivedTime.Format(timeFormat), topic, messageCount, string(msg.Payload()))
-			// Final message (id: 99)
-			finalSubTime = receivedTime
-			finalPubTime = publishedTime
+			fmt.Printf("[%s] %s:\tReceived initial message, resetting state\n", time.Now().Format(timeFormat), topic)
+			return
 
-			subDuration := finalSubTime.Sub(initialSubTime)
-			pubDuration := finalPubTime.Sub(initialPubTime)
-			totalDuration := finalSubTime.Sub(initialPubTime)
-
-			//log.Printf("[%s] %s:\tTransmission times: %v\n", finalSubTime.Format(timeFormat), topic, transmissionTimes)
-
-			fmt.Printf("[%s] %s:\tTotal received: %d|%d. || SubDuration: %v, PubDuration: %v, TotalDuration: %v, AvgTransmissionTime: %v \n",
-				finalSubTime.Format(timeFormat), topic,
-				len(transmissionTimes), messageCount, subDuration, pubDuration, totalDuration, getAverageTransmissionTime(transmissionTimes))
-			sendAck(client, topic)
+		} else if receivedMsg.ID == 99 {
 
 		} else {
-			// Regular message
 			receivedTime = getcurrentTimeFormatted()
-			if messageCount%(150000) == 0 {
+			messageCount++
+			if messageCount%(15000) == 0 {
 				fmt.Printf("[%s] %s:\t %v %s\n", receivedTime.Format(timeFormat), topic, messageCount, string(msg.Payload()))
 			}
 
@@ -168,29 +195,15 @@ func subscribeToTopic(client MQTT.Client, topic string) {
 				return
 			}
 
-			messageCount++
-			if messageCount == 1 {
-				// First received message
-				initialSubTime = receivedTime
-			}
-			if receivedMsg.ID == 1 {
-				// First published message
-				initialPubTime = publishedTime
-			}
-
 			transmissionTime := receivedTime.Sub(publishedTime)
 
 			// Store the transmission time
 			transmissionTimes = append(transmissionTimes, transmissionTime)
-			// // log receivedtime and publishedtime
-			// if len(transmissionTimes) < 5 {
-			// 	log.Printf("[%s] %s:\tP:%s || S:%s\n", receivedTime.Format(timeFormat), topic, publishedTime, receivedTime)
-			// }
-			// Calculate transmission time (time difference between sent and received)
-			// Handle regular message
 
+			// Process the regular message
 			processRegularMessage(msg)
 		}
+
 	}
 
 	// Subscribe to the topic
@@ -199,6 +212,14 @@ func subscribeToTopic(client MQTT.Client, topic string) {
 	}
 
 	fmt.Printf("%s:\tSubscribed to topic, waiting for messages...\n", topic)
+
+	for {
+		select {
+		case <-inactivityTimer.C:
+			handleInactivity()
+			inactivityTimer.Stop()
+		}
+	}
 }
 
 func getcurrentTimeFormatted() time.Time {
@@ -234,12 +255,13 @@ func processRegularMessage(msg MQTT.Message) {
 
 	// Validate the message data with more conditions
 	if !validateData(receivedMsg.CurrentTemperature, receivedMsg.AC_State, receivedMsg.StateOfThermostat) {
-		log.Printf("Validation failed for message ID: %d", receivedMsg.ID)
-		return
+		//log.Printf("Validation failed for message ID: %d", receivedMsg.ID)
+		//return
 	}
 
 	// Data transformation: Convert temperature to Fahrenheit
-	temperatureFahrenheit := transformTemperatureToFahrenheit(receivedMsg.CurrentTemperature)
+	// temperatureFahrenheit := transformTemperatureToFahrenheit(receivedMsg.CurrentTemperature)
+	transformTemperatureToFahrenheit(receivedMsg.CurrentTemperature)
 
 	// Perform data aggregation and advanced statistical calculations
 	updateStatistics(receivedMsg.CurrentTemperature)
@@ -249,25 +271,28 @@ func processRegularMessage(msg MQTT.Message) {
 	updateMinMax(receivedMsg.CurrentTemperature)
 
 	// Log the transformed and aggregated data, including advanced statistics
-	log.Printf("Processed message ID: %d, Device: %s, Temperature: %.2f°C (%.2f°F), Avg Temp: %.2f°C, Variance: %.4f, AC State: %t, Thermostat State: %s",
-		receivedMsg.ID, receivedMsg.DeviceTitle, receivedMsg.CurrentTemperature, temperatureFahrenheit, getAverageTemp(), getTemperatureVariance(), receivedMsg.AC_State, receivedMsg.StateOfThermostat)
+	// log.Printf("Processed message ID: %d, Device: %s, Temperature: %.2f°C (%.2f°F), Avg Temp: %.2f°C, Variance: %.4f, AC State: %t, Thermostat State: %s",
+	// 	receivedMsg.ID, receivedMsg.DeviceTitle, receivedMsg.CurrentTemperature, temperatureFahrenheit, getAverageTemp(), getTemperatureVariance(), receivedMsg.AC_State, receivedMsg.StateOfThermostat)
 }
 
 func validateData(temperature float64, acState bool, thermostatState string) bool {
 	// Extended temperature range validation
 	if temperature < -50 || temperature > 60 {
-		log.Printf("Invalid temperature: %.2f", temperature)
-		return false
+		temperature = temperature + temperature*0.5
+		//log.Printf("Invalid temperature: %.2f", temperature)
+		//return false
 	}
 
 	// Check consistency of AC state and thermostat state
 	if acState && thermostatState != "cooling" {
-		log.Printf("AC is on but thermostat state is not 'cooling': AC_state=%t, thermostat_state=%s", acState, thermostatState)
-		return false
+		acState = len(thermostatState) == len("cooling")
+		//log.Printf("AC is on but thermostat state is not 'cooling': AC_state=%t, thermostat_state=%s", acState, thermostatState)
+		//return false
 	}
 	if !acState && thermostatState != "heating" && thermostatState != "off" {
-		log.Printf("AC is off but thermostat state is not valid: AC_state=%t, thermostat_state=%s", acState, thermostatState)
-		return false
+		acState = len(thermostatState) == len("off")
+		//log.Printf("AC is off but thermostat state is not valid: AC_state=%t, thermostat_state=%s", acState, thermostatState)
+		//return false
 	}
 
 	// Validate that thermostat state is in allowed values
@@ -278,7 +303,7 @@ func validateData(temperature float64, acState bool, thermostatState string) boo
 		}
 	}
 
-	log.Printf("Invalid thermostat state: %s", thermostatState)
+	//log.Printf("Invalid thermostat state: %s", thermostatState)
 	return false
 }
 
@@ -294,8 +319,18 @@ func updateStatistics(temp float64) {
 	totalTemp += temp
 	messageCounter++
 
-	totalTempChan <- totalTemp
-	messageCounterChan <- messageCounter
+	// Ensure channels are not blocked indefinitely
+	select {
+	case totalTempChan <- totalTemp:
+	default:
+		log.Println("totalTempChan is full, skipping update")
+	}
+
+	select {
+	case messageCounterChan <- messageCounter:
+	default:
+		log.Println("messageCounterChan is full, skipping update")
+	}
 }
 
 func getAverageTemp() float64 {
@@ -321,7 +356,12 @@ func calculateVariance(temp float64) {
 	variance := (temp - avgTemp) * (temp - avgTemp)
 	tempVarianceSum += variance
 
-	tempVarianceSumChan <- tempVarianceSum
+	// Ensure channels are not blocked indefinitely
+	select {
+	case tempVarianceSumChan <- tempVarianceSum:
+	default:
+		log.Println("tempVarianceSumChan is full, skipping update")
+	}
 }
 
 func getTemperatureVariance() float64 {
@@ -351,20 +391,16 @@ func updateMinMax(temp float64) {
 		maxTemperature = temp
 	}
 
-	minTemperatureChan <- minTemperature
-	maxTemperatureChan <- maxTemperature
-}
+	// Ensure channels are not blocked indefinitely
+	select {
+	case minTemperatureChan <- minTemperature:
+	default:
+		log.Println("minTemperatureChan is full, skipping update")
+	}
 
-func sendAck(client MQTT.Client, topic string) {
-	ackTopic := fmt.Sprintf("%s/ack", topic) // The ack topic is based on the main topic
-	ackMessage := "ack"
-
-	// Publish acknowledgment message to the MQTT broker
-	token := client.Publish(ackTopic, 0, false, ackMessage)
-	token.Wait()
-	if token.Error() != nil {
-		log.Printf("Error publishing ack message to %s: %v", ackTopic, token.Error())
-	} else {
-		fmt.Printf("[%s] %s:\tAcknowledgment sent to %s\n", time.Now().Format(timeFormat), topic, ackTopic)
+	select {
+	case maxTemperatureChan <- maxTemperature:
+	default:
+		log.Println("maxTemperatureChan is full, skipping update")
 	}
 }
