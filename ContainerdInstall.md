@@ -37,6 +37,16 @@ Useful links:
 	
 	sudo install -m 755 runc.amd64 /usr/local/sbin/runc
 
+ -
+	[plugins."io.containerd.grpc.v1.cri".containerd]
+		  default_runtime_name = "runc"
+    
+	 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+	  runtime_type = "io.containerd.runc.v2"
+	
+	[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+	  BinaryName = "/usr/local/bin/runc/runc.amd64"
+
 ### CNI plugins:
 
 	wget "https://github.com/containernetworking/plugins/releases/download/v1.6.0/cni-plugins-linux-amd64-v1.6.0.tgz"
