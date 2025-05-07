@@ -39,13 +39,13 @@ Useful links:
 
  -
  
-	[plugins."io.containerd.grpc.v1.cri".containerd]
-		  default_runtime_name = "runc"
+	 [plugins."io.containerd.grpc.v1.cri".containerd]
+	  default_runtime_name = "runc"
     
 	 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
 	  runtime_type = "io.containerd.runc.v2"
 	
-	[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+	 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
 	  BinaryName = "/usr/local/bin/runc/runc.amd64"
 
 ### CNI plugins:
