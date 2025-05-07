@@ -76,6 +76,19 @@ Useful links:
 ### Crun
 
 	wget "https://github.com/containers/crun/releases/download/1.18/crun-1.18-linux-amd64"
+
+-
+
+	 version = 2
+	
+	[plugins."io.containerd.grpc.v1.cri".containerd]
+	  default_runtime_name = "crun"
+	
+	[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.crun]
+	  runtime_type = "io.containerd.runc.v2"
+	
+	[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.crun.options]
+	  BinaryName = "/usr/local/bin/crun/crun-1.20-linux-amd64"
 	
 ## Configure
 ### Containerd:
