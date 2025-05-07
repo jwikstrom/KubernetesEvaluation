@@ -266,3 +266,39 @@ To update pod with a new docker image remove the pod wait until a new pod appear
 To delete the deployment, do:
 
 	kubectl delete deployment mqtt-subscriber-deployment
+
+# Testing
+## Time sync
+setup time sync before running tests
+On separate first install chronyc, then verify:
+
+    chronyc sources
+	chronyc clients
+
+Open file:
+
+	sudo nano /etc/chrony/chrony.conf
+
+And check that these lines exist:
+
+	allow 192.168.1.0/24
+	local stratum 10
+
+Save file and restart
+
+	sudo systemctl restart chrony
+
+**On Windows Host**
+
+	w32tm /config /manualpeerlist:"192.168.1.103" /syncfromflags:manual /reliable:YES /update
+	net stop w32time
+	net start w32time
+	w32tm /resync
+
+Check status and get delay
+
+	w32tm /query /status
+	w32tm /stripchart /computer:192.168.1.103 /samples:5 /dataonly
+
+
+
